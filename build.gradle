@@ -1,0 +1,37 @@
+plugins {
+	id 'java'
+	id 'java-library'
+}
+
+group = 'io.pilju'
+version = '0.0.1'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	/* lombok */
+//	implementation 'org.projectlombok:lombok:1.18.22'
+//	annotationProcessor 'org.projectlombok:lombok'
+
+	/* keycloak */
+	implementation 'org.keycloak:keycloak-model-legacy:21.1.1'
+
+	implementation 'org.keycloak:keycloak-core:21.1.1'
+	compileOnly 'org.keycloak:keycloak-server-spi:21.1.1'
+	implementation 'org.jboss.logging:jboss-logging:3.4.0.Final'
+	implementation 'org.jboss.arquillian.graphene:graphene-webdriver-impl:2.3.2'
+	implementation 'org.jboss.arquillian.graphene:graphene-webdriver-spi:2.3.2'
+
+	/* DB */
+	implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+	implementation 'org.hibernate.orm:hibernate-core:6.1.7.Final'
+//	implementation 'org.mybatis:mybatis:3.5.13'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
