@@ -20,15 +20,9 @@ package io.pilju.spi.connectdb;
 
 import static io.pilju.spi.connectdb.DatabaseConstants.*;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Properties;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.component.ComponentModel;
@@ -95,14 +89,14 @@ public class CustomUserStorageProviderFactory implements UserStorageProviderFact
     @Override
     public void validateConfiguration(KeycloakSession session, RealmModel realm, ComponentModel config) throws ComponentValidationException {
         try (Connection c = DbUtil.getConnection(config)) {
-            System.out.println("[I84] Testing connection...");
+            logger.info("[I84] Testing connection...");
 
             c.createStatement().execute(config.get(CONFIG_KEY_VALIDATION_QUERY));
 
-            System.out.println("[I92] Connection OK !" );
+            logger.info("[I92] Connection OK !" );
         }
         catch(Exception ex) {
-            System.out.println("[W94] Unable to validate connection: ex="+ ex.getMessage());
+            logger.info("[W94] Unable to validate connection: ex="+ ex.getMessage());
             throw new ComponentValidationException("Unable to validate database connection",ex);
         }
     }
@@ -114,12 +108,12 @@ public class CustomUserStorageProviderFactory implements UserStorageProviderFact
 
     @Override
     public CustomUserStorageProvider create(KeycloakSession session, ComponentModel model) {
+        logger.info("CustomUserStorageProviderFactory create");
         return new CustomUserStorageProvider(session, model);
     }
 
     @Override
     public void init(Config.Scope config) {
-        logger.debug("init PROVIDER_NAME :: {}", new String[]{PROVIDER_NAME});
-        logger.info("init PROVIDER_NAME :: End");
+        logger.info("CustomUserStorageProviderFactory init PROVIDER_NAME :: {}", new String[]{PROVIDER_NAME});
     }
 }

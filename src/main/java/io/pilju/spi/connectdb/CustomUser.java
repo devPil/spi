@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.component.ComponentModel;
+import org.keycloak.credential.LegacyUserCredentialManager;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.SubjectCredentialManager;
@@ -13,7 +14,7 @@ import org.keycloak.storage.adapter.AbstractUserAdapter;
 
 
 class CustomUser extends AbstractUserAdapter {
-    
+
     private final String username;
     private final String email;
     private final String firstName;
@@ -69,8 +70,7 @@ class CustomUser extends AbstractUserAdapter {
 
     @Override
     public SubjectCredentialManager credentialManager() {
-        // TODO: 구현필요
-        return null;
+        return new LegacyUserCredentialManager(session, realm, this);
     }
 
     public Date getBirthDate() {

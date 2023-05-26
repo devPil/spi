@@ -26,13 +26,14 @@ import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
 import org.keycloak.storage.user.UserRegistrationProvider;
 
-public class CustomUserStorageProvider implements
-        UserStorageProvider,
-        UserLookupProvider,
-        CredentialInputValidator,
-        CredentialInputUpdater,
-        UserRegistrationProvider,
-        UserQueryProvider {
+public class CustomUserStorageProvider implements UserStorageProvider,
+    UserLookupProvider,
+    CredentialInputValidator,
+    CredentialInputUpdater,
+    UserRegistrationProvider,
+    UserQueryProvider {
+
+//    private static final Logger logger = Logger.getLogger(CustomUserStorageProvider.class);
     protected KeycloakSession session;
     protected ComponentModel model;
 
@@ -47,46 +48,48 @@ public class CustomUserStorageProvider implements
     @Override
     public UserModel getUserByUsername(RealmModel realm, String username) {
         System.out.println("========== getUserByUsername Call");
-        try ( Connection c = DbUtil.getConnection(this.model)) {
-            PreparedStatement st = c.prepareStatement("select username, firstName,lastName, email, birthDate from users where username = ?");
+        try (Connection c = DbUtil.getConnection(this.model)) {
+            PreparedStatement st = c.prepareStatement(DatabaseQueryConstants.getUserListByUserName);
             st.setString(1, username);
             st.execute();
             ResultSet rs = st.getResultSet();
-            if ( rs.next()) {
-                return mapUser(realm,rs);
-            }
-            else {
+            if (rs.next()) {
+                return mapUser(realm, rs);
+            } else {
                 return null;
             }
-        }
-        catch(SQLException ex) {
-            throw new RuntimeException("Database error:" + ex.getMessage(),ex);
+        } catch (SQLException ex) {
+            throw new RuntimeException("Database error:" + ex.getMessage(), ex);
         }
     }
-    
 
-    protected UserModel createAdapter(RealmModel realm, String username) {
-        System.out.println("createAdapter");
-        return new AbstractUserAdapterFederatedStorage(session, realm, model) {
-            @Override
-            public String getUsername() {
-                return username;
-            }
 
-            @Override
-            public void setUsername(String username) {
-//                String pw = (String)properties.remove(username);
-//                if (pw != null) {
-//                    properties.put(username, pw);
-//                    save();
-//                }
-            }
-        };
-    }
+//    protected UserModel createAdapter(RealmModel realm, String username) {
+//        System.out.println("========== createAdapter Call");
+//        return new AbstractUserAdapterFederatedStorage(session, realm, model) {
+//            @Override
+//            public String getUsername() {
+//                System.out.println(session);
+//                System.out.println("getUsername");
+//                return username;
+//            }
+//
+//            @Override
+//            public void setUsername(String username) {
+//                System.out.println("setUsername :: " + username);
+////                String pw = (String)properties.remove(username);
+////                if (pw != null) {
+////                    properties.put(username, pw);
+////                    save();
+////                }
+//            }
+//        };
+//    }
 
     @Override
     public UserModel getUserById(RealmModel realm, String id) {
-        System.out.println("========== getUserById Call");
+        System.out.println("========== getUserById Call id :: " + id + "==========");
+
         StorageId storageId = new StorageId(id);
         String username = storageId.getExternalId();
         return getUserByUsername(realm, username);
@@ -94,6 +97,21 @@ public class CustomUserStorageProvider implements
 
     @Override
     public UserModel getUserByEmail(RealmModel realm, String email) {
+        System.out.println("========== getUserByEmail Call email :: " + email);
+
+        try (Connection c = DbUtil.getConnection(this.model)) {
+            String query = DatabaseQueryConstants.getUserListByEmail;
+            PreparedStatement st = c.prepareStatement(query);
+            st.setString(1, email);
+            st.execute();
+            ResultSet rs = st.getResultSet();
+            while (rs.next()) {
+                return mapUser(realm, rs);
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Database error:" + ex.getMessage(), ex);
+        }
+
         return null;
     }
 
@@ -109,40 +127,47 @@ public class CustomUserStorageProvider implements
     // UserQueryProvider method implementations
 
     @Override
-    public Stream<UserModel> searchForUserStream(RealmModel realm, String search, Integer firstResult, Integer maxResults) {
+    public Stream<UserModel> searchForUserStream(RealmModel realm, String search,
+        Integer firstResult, Integer maxResults) {
         System.out.println("========== searchForUserStream Call - 1");
         List<UserModel> users = new LinkedList<>();
         System.out.println("search :: " + search);
-        System.out.println("getAttributes :: " + realm.getAttributes());
 
-        try ( Connection c = DbUtil.getConnection(this.model)) {
-            PreparedStatement st = c.prepareStatement(DatabaseQueryConstants.getUserList);
+        try (Connection c = DbUtil.getConnection(this.model)) {
+            String query = DatabaseQueryConstants.getUserListByUserName;
+            if (search.equals("*")) {
+                query = DatabaseQueryConstants.getUserList;
+            }
+            PreparedStatement st = c.prepareStatement(query);
             st.setString(1, search);
             st.execute();
             ResultSet rs = st.getResultSet();
-            if (rs.next()) {
-                users.add(mapUser(realm,rs));
+            while (rs.next()) {
+                users.add(mapUser(realm, rs));
             }
-        }
-        catch(SQLException ex) {
-            throw new RuntimeException("Database error:" + ex.getMessage(),ex);
+        } catch (SQLException ex) {
+            throw new RuntimeException("Database error:" + ex.getMessage(), ex);
         }
 
         return users.stream();
     }
 
     @Override
-    public Stream<UserModel> searchForUserStream(RealmModel realm, Map<String, String> params, Integer firstResult,
-            Integer maxResults) {
+    public Stream<UserModel> searchForUserStream(RealmModel realm, Map<String, String> params,
+        Integer firstResult,
+        Integer maxResults) {
         System.out.println("========== searchForUserStream Call - 2");
         // only support searching by username
         String usernameSearchString = params.get("username");
-        if (usernameSearchString == null) return Stream.empty();
+        if (usernameSearchString == null) {
+            return Stream.empty();
+        }
         return searchForUserStream(realm, usernameSearchString, firstResult, maxResults);
     }
 
     @Override
-    public Stream<UserModel> getGroupMembersStream(RealmModel realm, GroupModel group, Integer firstResult, Integer maxResults) {
+    public Stream<UserModel> getGroupMembersStream(RealmModel realm, GroupModel group,
+        Integer firstResult, Integer maxResults) {
         System.out.println("========== getGroupMembersStream Call - 1");
         // runtime automatically handles querying UserFederatedStorage
         return Stream.empty();
@@ -156,12 +181,12 @@ public class CustomUserStorageProvider implements
     }
 
     @Override
-    public Stream<UserModel> searchForUserByUserAttributeStream(RealmModel realm, String attrName, String attrValue) {
+    public Stream<UserModel> searchForUserByUserAttributeStream(RealmModel realm, String attrName,
+        String attrValue) {
         System.out.println("========== searchForUserByUserAttributeStream Call - 1");
         // runtime automatically handles querying UserFederatedStorage
         return Stream.empty();
     }
-
 
     // UserRegistrationProvider method implementations
 
@@ -177,76 +202,75 @@ public class CustomUserStorageProvider implements
 //        }
     }
 
+    // 키클락디비에 추가됨.
     @Override
     public UserModel addUser(RealmModel realm, String username) {
-        System.out.println("========== addUser Call");
-        System.out.println(realm.getAttributes());
-        System.out.println(username);
-        System.out.println("========== addUser End");
-        return createAdapter(realm, username);
+        return null;
+//        return createAdapter(realm, username);
     }
 
+    // 회원삭제 및 탈퇴
     @Override
     public boolean removeUser(RealmModel realm, UserModel user) {
         System.out.println("========== removeUser Call");
-//        synchronized (properties) {
-//            if (properties.remove(user.getUsername()) == null) return false;
-//            save();
-//            return true;
-//        }
-        return false;
+
+        String userName = user.getUsername();
+        try (Connection c = DbUtil.getConnection(this.model)) {
+            // Select
+            PreparedStatement st = c.prepareStatement(DatabaseQueryConstants.getUserListByUserName);
+            st.setString(1, userName);
+            st.execute();
+            ResultSet rs = st.getResultSet();
+            if (!rs.next()) {
+                return false;
+            }
+            // 삭제
+            PreparedStatement strm = c.prepareStatement(DatabaseQueryConstants.getUserListByUserName);
+            strm.setString(1, rs.getString("username"));
+            return strm.execute();
+        } catch (SQLException ex) {
+            throw new RuntimeException("Database error:" + ex.getMessage(), ex);
+        }
     }
-
-
-
-
 
     // CredentialInputValidator methods
 
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-//        String password = properties.getProperty(user.getUsername());
-        String password = "";
-        return credentialType.equals(PasswordCredentialModel.TYPE) && password != null;
+        System.out.println("========== isConfiguredFor Call");
+        return supportsCredentialType(credentialType);
     }
 
     @Override
     public boolean supportsCredentialType(String credentialType) {
-        return credentialType.equals(PasswordCredentialModel.TYPE);
+        System.out.println("========== supportsCredentialType Call" + credentialType);
+        return PasswordCredentialModel.TYPE.endsWith(credentialType);
     }
 
     // 인증확인
     @Override
-    public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
-//        if (!supportsCredentialType(input.getType()) || !(input instanceof UserCredentialModel)) return false;
-//
-//        UserCredentialModel cred = (UserCredentialModel)input;
-//        String password = properties.getProperty(user.getUsername());
-//        if (password == null || UNSET_PASSWORD.equals(password)) return false;
-//        return password.equals(cred.getValue());
+    public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
+        System.out.println("====== isValid ======");
+        if (!this.supportsCredentialType(credentialInput.getType())) {
+            return false;
+        }
+
         StorageId sid = new StorageId(user.getId());
         String username = sid.getExternalId();
 
-        System.out.println("====== isValid ======");
-        System.out.println(input.getCredentialId());
-        System.out.println(input.getType());
-        System.out.println(input.getChallengeResponse());
-        try ( Connection c = DbUtil.getConnection(this.model)) {
-            PreparedStatement st = c.prepareStatement("select password from users where username = ?");
+        try (Connection c = DbUtil.getConnection(this.model)) {
+            PreparedStatement st = c.prepareStatement(DatabaseQueryConstants.getPasswordByUserName);
             st.setString(1, username);
             st.execute();
             ResultSet rs = st.getResultSet();
-            if ( rs.next()) {
+            if (rs.next()) {
                 String pwd = rs.getString(1);
-//                return pwd.equals(credentialInput.getChallengeResponse());
+                return pwd.equals(credentialInput.getChallengeResponse());
+            } else {
                 return false;
             }
-            else {
-                return false;
-            }
-        }
-        catch(SQLException ex) {
-            throw new RuntimeException("Database error:" + ex.getMessage(),ex);
+        } catch (SQLException ex) {
+            throw new RuntimeException("Database error:" + ex.getMessage(), ex);
         }
 
     }
@@ -255,6 +279,9 @@ public class CustomUserStorageProvider implements
 
     @Override
     public boolean updateCredential(RealmModel realm, UserModel user, CredentialInput input) {
+        System.out.println("========== updateCredential Call :: {}");
+        System.out.println(user);
+        System.out.println(input);
 //        if (!(input instanceof UserCredentialModel)) return false;
 //        if (!input.getType().equals(PasswordCredentialModel.TYPE)) return false;
 //        UserCredentialModel cred = (UserCredentialModel)input;
@@ -267,6 +294,9 @@ public class CustomUserStorageProvider implements
 
     @Override
     public void disableCredentialType(RealmModel realm, UserModel user, String credentialType) {
+        System.out.println("========== disableCredentialType Call :: {}");
+        System.out.println(user);
+        System.out.println(credentialType);
 //        if (!credentialType.equals(PasswordCredentialModel.TYPE)) return;
 //        synchronized (properties) {
 //            properties.setProperty(user.getUsername(), UNSET_PASSWORD);
@@ -282,12 +312,14 @@ public class CustomUserStorageProvider implements
 
     @Override
     public Stream<String> getDisableableCredentialTypesStream(RealmModel realm, UserModel user) {
+        System.out.println("========== disableCredentialType Call :: {}");
+        System.out.println(user);
         return disableableTypes.stream();
     }
 
     @Override
     public void close() {
-
+        System.out.println("========== close Call :: {}");
     }
 
     private UserModel mapUser(RealmModel realm, ResultSet rs) throws SQLException {
