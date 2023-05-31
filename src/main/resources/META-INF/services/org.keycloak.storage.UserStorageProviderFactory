@@ -1,1 +1,1 @@
-io.pilju.spi.connectdb.CustomUserStorageProviderFactory
+io.pilju.spi.provider.CustomUserStorageProviderFactory

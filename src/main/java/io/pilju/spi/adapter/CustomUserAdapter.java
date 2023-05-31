@@ -1,5 +1,6 @@
-package io.pilju.spi.connectdb;
+package io.pilju.spi.adapter;
 
+import io.pilju.spi.entity.CustomUserModel;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;

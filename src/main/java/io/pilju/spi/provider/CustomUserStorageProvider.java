@@ -1,5 +1,8 @@
-package io.pilju.spi.connectdb;
+package io.pilju.spi.provider;
 
+import io.pilju.spi.adapter.CustomUserAdapter;
+import io.pilju.spi.entity.CustomUserModel;
+import io.pilju.spi.mapper.CustomUserMapper;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;

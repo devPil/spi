@@ -1,4 +1,4 @@
-package io.pilju.spi.connectdb;
+package io.pilju.spi.constants;
 
 public class DatabaseQueryConstants {
     public static final String getUserListByUserName = "select username, email, firstname, lastname, birthDate from users where username = ?";

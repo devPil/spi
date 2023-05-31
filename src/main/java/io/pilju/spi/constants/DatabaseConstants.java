@@ -1,4 +1,4 @@
-package io.pilju.spi.connectdb;
+package io.pilju.spi.constants;
 
 public class DatabaseConstants {
 //    jdbc:mariadb://localhost:3306

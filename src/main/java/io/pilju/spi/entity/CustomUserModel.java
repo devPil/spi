@@ -1,4 +1,4 @@
-package io.pilju.spi.connectdb;
+package io.pilju.spi.entity;
 
 import java.util.Date;
 import lombok.AllArgsConstructor;

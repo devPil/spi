@@ -1,8 +1,9 @@
-package io.pilju.spi.connectdb;
+package io.pilju.spi.provider;
 
 
-import static io.pilju.spi.connectdb.DatabaseConstants.*;
+import static io.pilju.spi.constants.DatabaseConstants.*;
 
+import io.pilju.spi.utils.DbUtil;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Properties;

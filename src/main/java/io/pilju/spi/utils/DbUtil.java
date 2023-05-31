@@ -1,6 +1,6 @@
-package io.pilju.spi.connectdb;
+package io.pilju.spi.utils;
 
-import static io.pilju.spi.connectdb.DatabaseConstants.*;
+import static io.pilju.spi.constants.DatabaseConstants.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
