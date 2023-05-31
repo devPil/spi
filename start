@@ -1,0 +1,3 @@
+#!/bin/sh
+
+./gradlew clean && ./gradlew build && cp -f /Users/piljulee/Workspace/pilju/spi_new/build/libs/PIL_SPI_NEW-0.0.1.jar /Users/piljulee/Workspace/keycloak/keycloak-21.1.1/providers/provider.jar && /Users/piljulee/Workspace/keycloak/keycloak-21.1.1/bin/kc.sh build && /Users/piljulee/Workspace/keycloak/keycloak-21.1.1/bin/kc.sh start

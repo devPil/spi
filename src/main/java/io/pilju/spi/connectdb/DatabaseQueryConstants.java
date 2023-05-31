@@ -6,7 +6,6 @@ public class DatabaseQueryConstants {
     public static final String getUserListByEmail = "select username, email, firstname, lastname, birthDate from users where email = ?";
     public static final String getPasswordByUserName = "select password from users where username = ?";
     public static final String removeUserByUserName = "delete from users where username = ?";
-
     public static final String addUser = "";
 
 }
