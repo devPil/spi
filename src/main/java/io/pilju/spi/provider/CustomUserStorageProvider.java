@@ -17,6 +17,8 @@ import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.PasswordCredentialModel;
+import org.keycloak.representations.account.UserRepresentation;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
@@ -64,7 +66,7 @@ public class CustomUserStorageProvider implements UserStorageProvider,
     @Override
     public boolean supportsCredentialType(String credentialType) {
         logger.info("supportsCredentialType credentialType :: {0}", new Object[]{credentialType});
-        return true;
+        return PasswordCredentialModel.TYPE.equals(credentialType);
     }
 
     @Override
@@ -75,8 +77,15 @@ public class CustomUserStorageProvider implements UserStorageProvider,
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
-        logger.info("isValid :: {0}", new Object[]{user});
-        return true;
+        logger.info("isValid :: {0}", new Object[]{user.getAttributes()});
+        String requestPw = credentialInput.getChallengeResponse();
+        StorageId sid = new StorageId(user.getId());
+        try {
+            String pw = mapper.getUserPassword(sid.getExternalId());
+            return requestPw.equals(pw);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -140,9 +149,11 @@ public class CustomUserStorageProvider implements UserStorageProvider,
         );
         List<UserModel> userModels = new ArrayList<>();
         try {
-            List<CustomUserModel> customUserModels = mapper.getUsers();
+            List<CustomUserModel> customUserModels;
             if (!"*".equals(search)) {
                 customUserModels = mapper.getUsers(search);
+            } else {
+                customUserModels = mapper.getUsers();
             }
             logger.info("searchForUserStream customUserModels :: {0}", new Object[]{customUserModels});
             return customUserModels.stream().map(v -> new CustomUserAdapter(session, realm, model, v));
@@ -168,12 +179,14 @@ public class CustomUserStorageProvider implements UserStorageProvider,
 
     @Override
     public Stream<UserModel> getGroupMembersStream(RealmModel realm, GroupModel group) {
+        logger.info("getGroupMembersStream call group id :: {0}, name :: {1}", new Object[]{group.getId(), group.getName()});
         return getGroupMembersStream(realm, group, null, null);
     }
 
     @Override
     public Stream<UserModel> searchForUserByUserAttributeStream(RealmModel realm, String attrName,
         String attrValue) {
+        logger.info("searchForUserByUserAttributeStream attrName :: {0}, attrValue :: {1}", new Object[]{attrName, attrValue});
         return null;
     }
 

@@ -31,11 +31,33 @@ public class CustomUserMapper {
         }
     }
 
+    public String getUserPassword(String username) throws SQLException {
+        try (Connection c = DbUtil.getConnection(config)) {
+            PreparedStatement st = c.prepareStatement(DatabaseQueryConstants.getPasswordByUserName);
+            st.setString(1, username);
+            return selectOneResultString(st.executeQuery(), "password");
+        }
+    }
+
     public List<CustomUserModel> getUsers() throws SQLException {
         try (Connection c = DbUtil.getConnection(config)) {
             PreparedStatement st = c.prepareStatement(DatabaseQueryConstants.getUserList);
             return selectAll(st.executeQuery());
         }
+    }
+
+    private String selectOneResultString(ResultSet rs, String columnName) throws SQLException {
+        List<String> columnList = new ArrayList<>();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+
+        for (int i = 1; i <= columnCount; i++) {
+            columnList.add(metaData.getColumnLabel(i));
+        }
+        if (rs.next()) {
+            return getString(columnList, columnName, rs);
+        }
+        return "";
     }
 
     private List<CustomUserModel> selectAll(ResultSet rs) throws SQLException {
@@ -59,13 +81,13 @@ public class CustomUserMapper {
                 .build();
             result.add(userModel);
         }
-        System.out.println(result);
         return result;
     }
 
     private String getString(List<String> columnList, String columnLabel, ResultSet rs) throws SQLException {
         if (columnList.contains(columnLabel)) {
-            return rs.getString(columnLabel);
+            String result = rs.getString(columnLabel);
+            return result;
         }
         return "";
     }
