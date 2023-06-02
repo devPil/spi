@@ -1,5 +1,14 @@
+# User Storage SPI 테스트
 
 ```mariadb
+/* Example DATABASE Script (mariadb) */
+
+CREATE DATABASE TEST;
+
+USE TEST;
+
+# drop table users;
+
 CREATE TABLE `users`
 (
     `username`  varchar(64)  NOT NULL,
@@ -15,7 +24,7 @@ CREATE TABLE `users`
 ;
 
 INSERT INTO TEST.users (username, password, email, firstName, lastName, birthDate) VALUES ('user1', '1', '1@example.com', 'first1', 'last1', '2023-05-25');
-INSERT INTO TEST.users (username, password, email, firstName, lastName, birthDate) VALUES ('user2', '1', '1@example.com', 'first2', 'last2', '2023-05-25');
-INSERT INTO TEST.users (username, password, email, firstName, lastName, birthDate) VALUES ('user3', '1', '1@example.com', 'first3', 'last3', '2023-05-25');
+INSERT INTO TEST.users (username, password, email, firstName, lastName, birthDate) VALUES ('user2', '1', '2@example.com', 'first2', 'last2', '2023-05-25');
+INSERT INTO TEST.users (username, password, email, firstName, lastName, birthDate) VALUES ('user3', '1', '3@example.com', 'first3', 'last3', '2023-05-25');
 
 ```
