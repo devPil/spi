@@ -69,7 +69,6 @@ public class CustomUserMapper {
         for (int i = 1; i <= columnCount; i++) {
             columnList.add(metaData.getColumnLabel(i));
         }
-
         while (rs.next()) {
             CustomUserModel userModel = CustomUserModel.builder()
                 .username(getString(columnList, "username", rs))
