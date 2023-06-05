@@ -19,12 +19,9 @@ import org.keycloak.storage.UserStorageProviderFactory;
 
 public class CustomUserStorageProviderFactory implements UserStorageProviderFactory<CustomUserStorageProvider> {
 
+    private static final String USER_STORAGE_NAME = "CUSTOM_USER_PROVIDER";
     private static final Logger logger = Logger.getLogger(CustomUserStorageProviderFactory.class);
-
-    public static final String PROVIDER_NAME = "mybatis-providers";
-
     protected static final List<ProviderConfigProperty> configMetadata;
-
     protected Properties properties = new Properties();
 
     static {
@@ -87,7 +84,7 @@ public class CustomUserStorageProviderFactory implements UserStorageProviderFact
 
     @Override
     public String getId() {
-        return PROVIDER_NAME;
+        return USER_STORAGE_NAME;
     }
 
     @Override
@@ -98,6 +95,6 @@ public class CustomUserStorageProviderFactory implements UserStorageProviderFact
 
     @Override
     public void init(Config.Scope config) {
-        logger.info("CustomUserStorageProviderFactory init PROVIDER_NAME :: {0}", new String[]{PROVIDER_NAME});
+        logger.info("CustomUserStorageProviderFactory init PROVIDER_NAME :: {0}", new String[]{USER_STORAGE_NAME});
     }
 }
