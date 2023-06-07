@@ -16,10 +16,17 @@ import lombok.ToString;
 @Builder
 public class CustomUserModel {
 
-    private String username;
-    private String email;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private Date birthDate;
+    private String companyCd;
+    private String userId;
+    private String userNm;
+    private String userPw;
+    private String deptCd;
+    private String emailAddress;
+
+//    private String username;
+//    private String email;
+//    private String password;
+//    private String firstName;
+//    private String lastName;
+//    private Date birthDate;
 }

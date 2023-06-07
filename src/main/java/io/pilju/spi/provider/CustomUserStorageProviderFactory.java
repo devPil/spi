@@ -17,9 +17,10 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.storage.UserStorageProviderFactory;
 
+
 public class CustomUserStorageProviderFactory implements UserStorageProviderFactory<CustomUserStorageProvider> {
 
-    private static final String USER_STORAGE_NAME = "CUSTOM_USER_PROVIDER";
+    private static final String USER_STORAGE_NAME = "WMS_USER";
     private static final Logger logger = Logger.getLogger(CustomUserStorageProviderFactory.class);
     protected static final List<ProviderConfigProperty> configMetadata;
     protected Properties properties = new Properties();
@@ -30,7 +31,7 @@ public class CustomUserStorageProviderFactory implements UserStorageProviderFact
             .property().name(CONFIG_KEY_JDBC_DRIVER)
                 .label("JDBC Driver Class")
                 .type(ProviderConfigProperty.STRING_TYPE)
-                .defaultValue("org.h2.Driver")
+                .defaultValue("org.mariadb.jdbc")
                 .helpText("Fully qualified class name of the JDBC driver")
             .add()
             .property().name(CONFIG_KEY_JDBC_URL)

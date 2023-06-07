@@ -17,7 +17,7 @@ import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
 
 public class CustomUserAdapter extends AbstractUserAdapterFederatedStorage {
 
-    private static final List<String> ATTRIBUTES_LIST = Arrays.asList("birthDate");
+    private static final List<String> ATTRIBUTES_LIST = Arrays.asList("compaynCd", "userNm", "deptCd");
     private static final Logger logger = Logger.getLogger(CustomUserAdapter.class);
     protected CustomUserModel customUserModel;
     protected String keycloakId;
@@ -28,110 +28,106 @@ public class CustomUserAdapter extends AbstractUserAdapterFederatedStorage {
         ) {
         super(session, realm, model);
         this.customUserModel = customUserModel;
-        this.keycloakId = StorageId.keycloakId(model, customUserModel.getUsername());
+        this.keycloakId = StorageId.keycloakId(model, customUserModel.getUserId());
     }
 
     @Override
     public String getUsername() {
-        logger.info("[CustomUserAdapter] getUsername Call userName :: {0}", new Object[]{customUserModel.getUsername()});
-        return customUserModel.getUsername();
+        logger.info("[CustomUserAdapter] getUsername Call userName :: {0}", new Object[]{customUserModel.getUserId()});
+        return customUserModel.getUserId();
     }
 
     @Override
     public void setUsername(String username) {
         logger.info("[CustomUserAdapter] setUsername :: {0}", new Object[]{username});
-        customUserModel.setUsername(username);
+        customUserModel.setUserId(username);
     }
 
     @Override
     public String getFirstName() {
-        return customUserModel.getFirstName();
+        return "";
     }
 
     @Override
-    public void setFirstName(String firstName) {
-        customUserModel.setFirstName(firstName);
-    }
+    public void setFirstName(String firstName) {}
 
     @Override
     public String getLastName() {
-        return customUserModel.getLastName();
+        return "";
     }
 
     @Override
     public void setLastName(String lastName) {
-        customUserModel.setLastName(lastName);
     }
 
     @Override
     public String getEmail() {
-        return customUserModel.getEmail();
+        return customUserModel.getEmailAddress();
     }
 
     @Override
     public void setEmail(String email) {
-        customUserModel.setEmail(email);
+        customUserModel.setEmailAddress(email);
     }
 
 
     @Override
     public Map<String, List<String>> getAttributes() {
         MultivaluedHashMap<String, String> attributes = new MultivaluedHashMap<>();
-        attributes.add(UserModel.USERNAME, customUserModel.getUsername());
-        attributes.add(UserModel.EMAIL, customUserModel.getEmail());
-        attributes.add(UserModel.FIRST_NAME, customUserModel.getFirstName());
-        attributes.add(UserModel.LAST_NAME, customUserModel.getLastName());
-        attributes.add("birthDate", customUserModel.getBirthDate().toString());
+        attributes.add(UserModel.USERNAME, customUserModel.getUserId());
+        attributes.add(UserModel.EMAIL, customUserModel.getEmailAddress());
         return attributes;
     }
 
     @Override
     public void setSingleAttribute(String name, String value) {
         logger.info("[CustomUserAdapter] setSingleAttribute name :: {0}, value :: {1}", new String[]{name, value});
-        if (ATTRIBUTES_LIST.contains(name)) {
-            customUserModel.setBirthDate(new Date());
-        } else {
-            super.setSingleAttribute(name, value);
-        }
+//        if (ATTRIBUTES_LIST.contains(name)) {
+////            customUserModel.setBirthDate(new Date());
+//        } else {
+//            super.setSingleAttribute(name, value);
+//        }
     }
 
     @Override
     public void removeAttribute(String name) {
         logger.info("[CustomUserAdapter] removeAttribute name :: {0}", new String[]{name});
-        if (ATTRIBUTES_LIST.contains(name)) {
-            customUserModel.setBirthDate(null);
-        } else {
-            super.removeAttribute(name);
-        }
+//        if (ATTRIBUTES_LIST.contains(name)) {
+//            customUserModel.setBirthDate(null);
+//        } else {
+//            super.removeAttribute(name);
+//        }
     }
 
     @Override
     public void setAttribute(String name, List<String> values) {
         logger.info("[CustomUserAdapter] setAttribute name :: {0}, values :: {1}", new Object[]{name, values});
-        if (ATTRIBUTES_LIST.contains(name)) {
-            customUserModel.setBirthDate(new Date());
-        } else {
-            super.setAttribute(name, values);
-        }
+//        if (ATTRIBUTES_LIST.contains(name)) {
+//            customUserModel.setBirthDate(new Date());
+//        } else {
+//            super.setAttribute(name, values);
+//        }
     }
 
     @Override
     public String getFirstAttribute(String name) {
         logger.info("[CustomUserAdapter] getFirstAttribute name :: {0}", new Object[]{name});
-        if (ATTRIBUTES_LIST.contains(name)) {
-           return customUserModel.getBirthDate().toString();
-        } else {
-           return super.getFirstAttribute(name);
-        }
+//        if (ATTRIBUTES_LIST.contains(name)) {
+//           return customUserModel.getBirthDate().toString();
+//        } else {
+//           return super.getFirstAttribute(name);
+//        }
+        return "";
     }
 
     @Override
     protected String mapAttribute(String attributeName) {
         logger.info("[CustomUserAdapter] mapAttribute name :: {0}", new Object[]{attributeName});
-        if (ATTRIBUTES_LIST.contains(attributeName)) {
-            return customUserModel.getBirthDate().toString();
-        } else {
-            return super.mapAttribute(attributeName);
-        }
+//        if (ATTRIBUTES_LIST.contains(attributeName)) {
+//            return customUserModel.getBirthDate().toString();
+//        } else {
+//            return super.mapAttribute(attributeName);
+//        }
+        return "";
     }
 }

@@ -1,6 +1,5 @@
 plugins {
 	id 'java'
-//	id 'java-library'
 }
 
 group = 'io.pilju'
@@ -30,6 +29,7 @@ dependencies {
 	implementation "org.keycloak:keycloak-model-legacy:${keycloakVersion}"
 	implementation "org.keycloak:keycloak-core:${keycloakVersion}"
 	compileOnly "org.keycloak:keycloak-server-spi:${keycloakVersion}"
+
 
 	implementation 'org.jboss.logging:jboss-logging:3.4.0.Final'
 	implementation 'org.jboss.arquillian.graphene:graphene-webdriver-impl:2.3.2'

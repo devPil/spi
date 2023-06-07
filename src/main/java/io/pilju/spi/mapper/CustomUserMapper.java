@@ -71,12 +71,11 @@ public class CustomUserMapper {
         }
         while (rs.next()) {
             CustomUserModel userModel = CustomUserModel.builder()
-                .username(getString(columnList, "username", rs))
-                .email(getString(columnList, "email", rs))
-                .firstName(getString(columnList, "firstname", rs))
-                .lastName(getString(columnList, "lastname", rs))
-                .birthDate(getDate(columnList, "birthDate", rs))
-                .password(getString(columnList, "password", rs))
+                .userId(getString(columnList, "username", rs))
+                .emailAddress(getString(columnList, "email", rs))
+                .userPw(getString(columnList, "password", rs))
+                .companyCd(getString(columnList, "companyCd", rs))
+                .deptCd(getString(columnList, "deptCd", rs))
                 .build();
             result.add(userModel);
         }
